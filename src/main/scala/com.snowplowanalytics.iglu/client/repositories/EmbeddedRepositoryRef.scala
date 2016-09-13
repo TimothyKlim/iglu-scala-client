@@ -40,45 +40,45 @@ import ProcessingMessageMethods._
 import utils.{ValidationExceptions => VE}
 
 /**
- * Helpers for constructing an EmbeddedRepository.
- * See below for the definition.
- */
+  * Helpers for constructing an EmbeddedRepository.
+  * See below for the definition.
+  */
 object EmbeddedRepositoryRef {
 
   implicit val formats = DefaultFormats
 
   /**
-   * Sniffs a config JSON to determine if this is
-   * an embedded repository ref or not.
-   *
-   * @param config The configuration JSON to sniff
-   * @return true if this is the configuration for
-   *         an EmbeddedRepositoryRef, else false
-   */
+    * Sniffs a config JSON to determine if this is
+    * an embedded repository ref or not.
+    *
+    * @param config The configuration JSON to sniff
+    * @return true if this is the configuration for
+    *         an EmbeddedRepositoryRef, else false
+    */
   def isEmbedded(config: JValue): Boolean =
     (config \ "connection" \ "embedded").toSome.isDefined
 
   /**
-   * Constructs an EmbeddedRepositoryRef
-   * from a JsonNode.
-   *
-   * @param config The JSON containing the configuration
-   *        for this repository reference
-   * @return a configured reference to this embedded
-   *         repository
-   */
+    * Constructs an EmbeddedRepositoryRef
+    * from a JsonNode.
+    *
+    * @param config The JSON containing the configuration
+    *        for this repository reference
+    * @return a configured reference to this embedded
+    *         repository
+    */
   def parse(config: JsonNode): ValidatedNel[EmbeddedRepositoryRef] =
     parse(fromJsonNode(config))
 
   /**
-   * Constructs an EmbeddedRepositoryRef
-   * from a JValue.
-   *
-   * @param config The JSON containing the configuration
-   *        for this repository reference
-   * @return a configured reference to this embedded
-   *         repository
-   */
+    * Constructs an EmbeddedRepositoryRef
+    * from a JValue.
+    *
+    * @param config The JSON containing the configuration
+    *        for this repository reference
+    * @return a configured reference to this embedded
+    *         repository
+    */
   def parse(config: JValue): ValidatedNel[EmbeddedRepositoryRef] = {
     val conf = RepositoryRefConfig.parse(config)
     val path = extractPath(config)
@@ -86,53 +86,55 @@ object EmbeddedRepositoryRef {
   }
 
   /**
-   * Returns the path to this embedded repository.
-   *
-   * @param ref The JSON containing the configuration
-   *        for this repository reference
-   * @return the path to the embedded repository on
-   *         Success, or an error String on Failure
-   */
+    * Returns the path to this embedded repository.
+    *
+    * @param ref The JSON containing the configuration
+    *        for this repository reference
+    * @return the path to the embedded repository on
+    *         Success, or an error String on Failure
+    */
   private def extractPath(config: JValue): Validated[String] =
     try {
       (config \ "connection" \ "embedded" \ "path").extract[String].success
     } catch {
-      case me: MappingException => s"Could not extract connection.embedded.path from ${compact(render(config))}".fail.toProcessingMessage
+      case me: MappingException =>
+        s"Could not extract connection.embedded.path from ${compact(
+          render(config))}".failure.toProcessingMessage
     }
 
 }
 
 /**
- * An embedded repository is one which is embedded
- * inside the calling code, e.g. inside the jar's
- * resources folder.
- */
-case class EmbeddedRepositoryRef(
-  override val config: RepositoryRefConfig,
-  path: String) extends RepositoryRef {
+  * An embedded repository is one which is embedded
+  * inside the calling code, e.g. inside the jar's
+  * resources folder.
+  */
+case class EmbeddedRepositoryRef(override val config: RepositoryRefConfig,
+                                 path: String)
+    extends RepositoryRef {
 
   /**
-   * Prioritize searching this class of repository because
-   * it is low cost.
-   */
+    * Prioritize searching this class of repository because
+    * it is low cost.
+    */
   override val classPriority: Int = 1
 
   /**
-   * Human-readable descriptor for this
-   * type of repository ref.
-   */
+    * Human-readable descriptor for this
+    * type of repository ref.
+    */
   val descriptor = "embedded"
 
   /**
-   * Retrieves an IgluSchema from the Iglu Repo as
-   * a JsonNode.
-   *
-   * @param schemaKey The SchemaKey uniquely identifies
-   *        the schema in Iglu
-   * @return a Validation boxing either the Schema's
-   *         JsonNode on Success, or an error String
-   *         on Failure 
-   */
+    * Retrieves an IgluSchema from the Iglu Repo as
+    * a JsonNode.
+    *
+    * @param schemaKey The SchemaKey uniquely identifies
+    *        the schema in Iglu
+    * @return a Validation boxing either the Schema's
+    *         JsonNode on Success, or an error String
+    *         on Failure
+    */
   // TODO: would be nice to abstract out fail.toProcessingMessage, and scrubbing
   def lookupSchema(schemaKey: SchemaKey): Validated[Option[JsonNode]] = {
     val schemaPath = s"${path}/schemas/${schemaKey.toPath}"
@@ -140,11 +142,15 @@ case class EmbeddedRepositoryRef(
       JsonLoader.fromResource(schemaPath).some.success
     } catch {
       case jpe: JsonParseException => // Child of IOException so match first
-        s"Problem parsing ${schemaPath} as JSON in ${descriptor} Iglu repository ${config.name}: %s".format(VE.stripInstanceEtc(jpe.getMessage)).fail.toProcessingMessage
+        s"Problem parsing ${schemaPath} as JSON in ${descriptor} Iglu repository ${config.name}: %s"
+          .format(VE.stripInstanceEtc(jpe.getMessage))
+          .failure
+          .toProcessingMessage
       case ioe: IOException =>
         None.success // Schema not found
       case e: Throwable =>
-        s"Unknown problem reading and parsing ${schemaPath} in ${descriptor} Iglu repository ${config.name}: ${VE.getThrowableMessage(e)}".fail.toProcessingMessage
+        s"Unknown problem reading and parsing ${schemaPath} in ${descriptor} Iglu repository ${config.name}: ${VE
+          .getThrowableMessage(e)}".failure.toProcessingMessage
     }
   }
 }

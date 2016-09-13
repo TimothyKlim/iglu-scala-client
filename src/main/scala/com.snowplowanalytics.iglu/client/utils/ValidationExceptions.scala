@@ -17,55 +17,55 @@ package utils
 import org.apache.commons.lang3.exception.ExceptionUtils
 
 /**
- * Provides helpers around converting JVM
- * exceptions to Scalaz Validations.
- */
+  * Provides helpers around converting JVM
+  * exceptions to Scalaz Validations.
+  */
 object ValidationExceptions {
-  
+
   /**
-   * Strips the instance information from a Jackson
-   * parsing exception message:
-   *
-   * "... at [Source: java.io.StringReader@1fe7a8f8; line: 1, column: 2]""
-   *                                       ^^^^^^^^
-   *
-   * Also removes any control characters and replaces
-   * tabs with 4 spaces.
-   *
-   * @param message The exception message which needs
-   *        tidying up
-   * @return the same exception message, but with
-   *         instance information etc removed
-   */
+    * Strips the instance information from a Jackson
+    * parsing exception message:
+    *
+    * "... at [Source: java.io.StringReader@1fe7a8f8; line: 1, column: 2]""
+    *                                       ^^^^^^^^
+    *
+    * Also removes any control characters and replaces
+    * tabs with 4 spaces.
+    *
+    * @param message The exception message which needs
+    *        tidying up
+    * @return the same exception message, but with
+    *         instance information etc removed
+    */
   def stripInstanceEtc(message: String): String = {
     message
-    .replaceAll("@[0-9a-z]+;", "@xxxxxx;")
-    .replaceAll("\\t", "    ")
-    .replaceAll("\\p{Cntrl}", "") // Any other control character
-    .trim
+      .replaceAll("@[0-9a-z]+;", "@xxxxxx;")
+      .replaceAll("\\t", "    ")
+      .replaceAll("\\p{Cntrl}", "") // Any other control character
+      .trim
   }
 
   /**
-   * Get the message out of a Throwable's root cause
-   * (or failing that the Throwable itself) in a
-   * null-safe fashion.
-   *
-   * @param throwable The throwable to extract a message from
-   * @return the message from either the Throwable or
-   *         preferably its root cause, Option-boxed
-   */
+    * Get the message out of a Throwable's root cause
+    * (or failing that the Throwable itself) in a
+    * null-safe fashion.
+    *
+    * @param throwable The throwable to extract a message from
+    * @return the message from either the Throwable or
+    *         preferably its root cause, Option-boxed
+    */
   def getThrowableMessage(throwable: Throwable): Option[String] = {
 
     def getRootCauseIfExists(throwable: Throwable): Throwable =
       Option(ExceptionUtils.getRootCause(throwable)) match {
         case Some(root) => root
-        case None       => throwable
+        case None => throwable
       }
 
     for {
-      t  <- Option(throwable)
-      rc =  getRootCauseIfExists(t)
-      m  <- Option(rc.getMessage)
+      t <- Option(throwable)
+      rc = getRootCauseIfExists(t)
+      m <- Option(rc.getMessage)
     } yield m
   }
 

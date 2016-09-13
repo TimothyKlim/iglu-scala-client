@@ -33,108 +33,110 @@ import org.json4s.scalaz.JsonScalaz._
 import validation.ProcessingMessageMethods._
 
 /**
- * Singleton object contains a constructor
- * from a JValue.
- */
+  * Singleton object contains a constructor
+  * from a JValue.
+  */
 object RepositoryRefConfig {
 
   implicit val formats = DefaultFormats
 
   /**
-   * Parses the standard repository ref configuration
-   * out of the supplied JSON.
-   *
-   * @param config The JSON containing our repository
-   *        ref configuration
-   * @return either the RepositoryRefConfig on Success,
-   *         or a Nel of ProcessingMessages on Failure.
-   */
+    * Parses the standard repository ref configuration
+    * out of the supplied JSON.
+    *
+    * @param config The JSON containing our repository
+    *        ref configuration
+    * @return either the RepositoryRefConfig on Success,
+    *         or a Nel of ProcessingMessages on Failure.
+    */
   // TODO: convert the Scalaz Error sub-types to
   // ProcessingMessages more cleanly (not just via toString)
   def parse(config: JValue): ValidatedNel[RepositoryRefConfig] =
-    (field[String]("name")(config) |@| field[Int]("priority")(config) |@| field[List[String]]("vendorPrefixes")(config)) {
+    (field[String]("name")(config) |@| field[Int]("priority")(config) |@| field[
+      List[String]]("vendorPrefixes")(config)) {
       RepositoryRefConfig(_, _, _)
     }.leftMap(_.map(_.toString.toProcessingMessage))
 }
 
 /**
- * Common config for RepositoryRef classes.
- */
+  * Common config for RepositoryRef classes.
+  */
 case class RepositoryRefConfig(
-  name: String,
-  instancePriority: Int,
-  vendorPrefixes: List[String]
-  )
+    name: String,
+    instancePriority: Int,
+    vendorPrefixes: List[String]
+)
 
 /**
- * Common behavior for all RepositoryRef classes.
- */
+  * Common behavior for all RepositoryRef classes.
+  */
 trait RepositoryRef {
 
   /**
-   * Our configuration for this RepositoryRef
-   */
+    * Our configuration for this RepositoryRef
+    */
   val config: RepositoryRefConfig
 
   /**
-   * All repositories with a
-   * search priority of 1 will be checked before
-   * any repository with a search priority of 2.
-   */
+    * All repositories with a
+    * search priority of 1 will be checked before
+    * any repository with a search priority of 2.
+    */
   val classPriority: Int
 
   /**
-   * Human-readable descriptor for this
-   * type of repository ref.
-   */
+    * Human-readable descriptor for this
+    * type of repository ref.
+    */
   val descriptor: String
 
   /**
-   * Abstract method. Provide a concrete
-   * implementation for how to lookup a schema
-   * in this type of repository.
-   *
-   * @param schemaKey The SchemaKey uniquely identifying
-   *        the schema in Iglu
-   * @return a Validation boxing either the Schema's
-   *         JsonNode on Success, or an error String
-   *         on Failure 
-   */
+    * Abstract method. Provide a concrete
+    * implementation for how to lookup a schema
+    * in this type of repository.
+    *
+    * @param schemaKey The SchemaKey uniquely identifying
+    *        the schema in Iglu
+    * @return a Validation boxing either the Schema's
+    *         JsonNode on Success, or an error String
+    *         on Failure
+    */
   def lookupSchema(schemaKey: SchemaKey): Validated[Option[JsonNode]]
 
   /**
-   * Retrieves an IgluSchema from the Iglu Repo as
-   * a JsonNode. Unsafe - only use when you know the
-   * schema is available locally.
-   *
-   * @param schemaKey The SchemaKey uniquely identifies
-   *        the schema in Iglu
-   * @return the JsonNode representing this schema
-   */
+    * Retrieves an IgluSchema from the Iglu Repo as
+    * a JsonNode. Unsafe - only use when you know the
+    * schema is available locally.
+    *
+    * @param schemaKey The SchemaKey uniquely identifies
+    *        the schema in Iglu
+    * @return the JsonNode representing this schema
+    */
   def unsafeLookupSchema(schemaKey: SchemaKey): JsonNode = {
     def exception(msg: ProcessingMessage) =
-      new RuntimeException(s"Unsafe lookup of schema ${schemaKey} in ${descriptor} Iglu repository ${config.name} failed: ${msg}")
+      new RuntimeException(
+        s"Unsafe lookup of schema ${schemaKey} in ${descriptor} Iglu repository ${config.name} failed: ${msg}")
 
     lookupSchema(schemaKey) match {
       case Success(Some(schema)) => schema
-      case Success(None)         => throw exception("not found".toProcessingMessage)
-      case Failure(err)          => throw exception(err)
+      case Success(None) => throw exception("not found".toProcessingMessage)
+      case Failure(err) => throw exception(err)
     }
   }
 
   /**
-   * Helper to check if this repository should take
-   * priority because of a vendor prefix match. Returns
-   * true if we matched our schema's vendor in the
-   * list of vendor prefixes.
-   *
-   * @param schemaKey The SchemaKey uniquely identifying
-   *        the schema in Iglu. We will use the vendor
-   *        within the SchemaKey to match against our
-   *        prefixes
-   * @return whether this is a priority lookup or
-   *         not
-   */
+    * Helper to check if this repository should take
+    * priority because of a vendor prefix match. Returns
+    * true if we matched our schema's vendor in the
+    * list of vendor prefixes.
+    *
+    * @param schemaKey The SchemaKey uniquely identifying
+    *        the schema in Iglu. We will use the vendor
+    *        within the SchemaKey to match against our
+    *        prefixes
+    * @return whether this is a priority lookup or
+    *         not
+    */
   def vendorMatched(schemaKey: SchemaKey): Boolean = {
     val matches = for {
       p <- config.vendorPrefixes

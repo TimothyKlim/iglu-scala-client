@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (c) 2014 Snowplow Analytics Ltd. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
@@ -20,7 +20,9 @@ object IgluScalaClientBuild extends Build {
 
   // Configure prompt to show current project
   override lazy val settings = super.settings :+ {
-    shellPrompt := { s => Project.extract(s).currentProject.id + " > " }
+    shellPrompt := { s =>
+      Project.extract(s).currentProject.id + " > "
+    }
   }
 
   // Define our project, with basic project information and library dependencies

@@ -29,28 +29,31 @@ object SchemaValidation {
     new SyntaxValidator(ValidationConfiguration.byDefault())
 
   /**
-   * Get validation errors for Schema
-   * Errors like empty `required` property or `minimum` property containing string
-   * will be catched
-   *
-   * @param schema JSON Schema
-   * @return list of Processing Messages with log level above warning
-   */
+    * Get validation errors for Schema
+    * Errors like empty `required` property or `minimum` property containing string
+    * will be catched
+    *
+    * @param schema JSON Schema
+    * @return list of Processing Messages with log level above warning
+    */
   def getErrors(schema: JsonNode): List[ProcessingMessage] =
-    validator.validateSchema(schema).iterator.asScala
-      .filter(r => (r.getLogLevel == LogLevel.ERROR) || (r.getLogLevel == LogLevel.FATAL))
+    validator
+      .validateSchema(schema)
+      .iterator
+      .asScala
+      .filter(r =>
+        (r.getLogLevel == LogLevel.ERROR) || (r.getLogLevel == LogLevel.FATAL))
       .toList
 
   /**
-   * Validate JSON Schema against it's own Schema
-   * Errors like empty `required` property or `minimum` property containing string
-   * will be catched
-   *
-   * @param schema JSON Schema
-   * @return true if Schema is valid
-   */
+    * Validate JSON Schema against it's own Schema
+    * Errors like empty `required` property or `minimum` property containing string
+    * will be catched
+    *
+    * @param schema JSON Schema
+    * @return true if Schema is valid
+    */
   def isValid(schema: JsonNode): Boolean =
     getErrors(schema).isEmpty
 
 }
-

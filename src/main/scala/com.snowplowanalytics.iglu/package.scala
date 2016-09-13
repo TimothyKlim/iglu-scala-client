@@ -30,73 +30,73 @@ import client.repositories.RepositoryRef
 import client.Resolver.RepoError
 
 /**
- * Scala package object to hold types,
- * helper methods etc.
- *
- * See:
- * http://www.artima.com/scalazine/articles/package_objects.html
- */
+  * Scala package object to hold types,
+  * helper methods etc.
+  *
+  * See:
+  * http://www.artima.com/scalazine/articles/package_objects.html
+  */
 package object client {
 
   /**
-   * Helpful archetypes
-   */
+    * Helpful archetypes
+    */
   type Validated[A] = Validation[ProcessingMessage, A]
   type ValidatedNel[A] = ValidationNel[ProcessingMessage, A]
 
   /**
-   * Our LRU cache of schemas
-   */
+    * Our LRU cache of schemas
+    */
   type SchemaLruMap = SynchronizedLruMap[SchemaKey, SchemaLookup]
 
   /**
-   * Aggregated lookup failures for single schema
-   * Can be Some(ServerError) if repo returned error like timeout
-   * or None if repository doesn't contain schema for sure
-   */
+    * Aggregated lookup failures for single schema
+    * Can be Some(ServerError) if repo returned error like timeout
+    * or None if repository doesn't contain schema for sure
+    */
   type LookupFailure = Option[RepoError]
 
   /**
-   * Map of all repositories to its aggregated state of failure
-   * None as value means repository already responded with `not-found`,
-   * meaning all previous 500-like failures could probably been discarded
-   */
+    * Map of all repositories to its aggregated state of failure
+    * None as value means repository already responded with `not-found`,
+    * meaning all previous 500-like failures could probably been discarded
+    */
   type RepoFailuresMap = Map[RepositoryRef, LookupFailure]
 
   /**
-   * Validated schema lookup result containing, JsonNode in case of Success or
-   * Map of all currently failed repositories in case of Failure
-   */
+    * Validated schema lookup result containing, JsonNode in case of Success or
+    * Map of all currently failed repositories in case of Failure
+    */
   type SchemaLookup = Validation[RepoFailuresMap, JsonNode]
 
   /**
-   * Our List (possibly empty) of Iglu repositories
-   */
+    * Our List (possibly empty) of Iglu repositories
+    */
   type RepositoryRefs = List[RepositoryRef]
 
   /**
-   * Our list (possibly empty) of Processing Messages
-   */
+    * Our list (possibly empty) of Processing Messages
+    */
   type ProcessingMessages = List[ProcessingMessage]
 
   /**
-   * Our non-empty list of Processing Messages
-   */
+    * Our non-empty list of Processing Messages
+    */
   type ProcessingMessageNel = NonEmptyList[ProcessingMessage]
 
   /**
-   * Type alias for a SchemaVer-based version.
-   *
-   * TODO: update this in the future to be
-   * a full-fledged case class or similar:
-   * https://github.com/snowplow/iglu-scala-client/issues/20
-   */
+    * Type alias for a SchemaVer-based version.
+    *
+    * TODO: update this in the future to be
+    * a full-fledged case class or similar:
+    * https://github.com/snowplow/iglu-scala-client/issues/20
+    */
   type SchemaVer = String
 
   /**
-   * Type alias for a Tuple2
-   * containing a SchemaKey and its
-   * corresponding JsonNode.
-   */
+    * Type alias for a Tuple2
+    * containing a SchemaKey and its
+    * corresponding JsonNode.
+    */
   type JsonSchemaPair = Tuple2[SchemaKey, JsonNode]
 }

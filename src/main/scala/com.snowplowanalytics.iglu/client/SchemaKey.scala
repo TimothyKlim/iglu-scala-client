@@ -29,25 +29,26 @@ import validation.ProcessingMessageMethods
 import ProcessingMessageMethods._
 
 /**
- * Companion object contains a custom constructor for
- * an Iglu SchemaKey.
- */
+  * Companion object contains a custom constructor for
+  * an Iglu SchemaKey.
+  */
 object SchemaKey {
 
-  private val SchemaUriRegex = "^iglu:([a-zA-Z0-9-_.]+)/([a-zA-Z0-9-_]+)/([a-zA-Z0-9-_]+)/([0-9]+-[0-9]+-[0-9]+)$".r
+  private val SchemaUriRegex =
+    "^iglu:([a-zA-Z0-9-_.]+)/([a-zA-Z0-9-_]+)/([a-zA-Z0-9-_]+)/([0-9]+-[0-9]+-[0-9]+)$".r
 
   private val ModelRevisionAdditionRegex = "([0-9]+)-([0-9]+)-([0-9]+)".r
 
   /**
-   * Custom constructor for an Iglu SchemaKey from
-   * an Iglu-format schema URI, which looks like:
-   *
-   * iglu:com.snowplowanalytics.snowplow/mobile_context/jsonschema/1-0-0
-   *
-   * @param schemaUri An Iglu-format schema URI
-   * @return a Validation-boxed SchemaKey for
-   *         Success, and an error String on Failure
-   */
+    * Custom constructor for an Iglu SchemaKey from
+    * an Iglu-format schema URI, which looks like:
+    *
+    * iglu:com.snowplowanalytics.snowplow/mobile_context/jsonschema/1-0-0
+    *
+    * @param schemaUri An Iglu-format schema URI
+    * @return a Validation-boxed SchemaKey for
+    *         Success, and an error String on Failure
+    */
   def parse(schemaUri: String): Validated[SchemaKey] = schemaUri match {
     case SchemaUriRegex(vnd, n, f, ver) =>
       SchemaKey(vnd, n, f, ver).success
@@ -55,88 +56,89 @@ object SchemaKey {
       s"${schemaUri} is not a valid Iglu-format schema URI".toProcessingMessage.failure
   }
 
-  def parseNel(schemaUri: String): ValidatedNel[SchemaKey] = parse(schemaUri).toValidationNel
+  def parseNel(schemaUri: String): ValidatedNel[SchemaKey] =
+    parse(schemaUri).toValidationNel
 }
 
 /**
- * The four elements of any Iglu-compatible schema
- * key:
- *
- * 1. vendor
- * 2. name
- * 3. format
- * 4. version
- */
-case class SchemaKey(
-  val vendor: String,
-  val name: String,
-  val format: String,
-  val version: SchemaVer) {
+  * The four elements of any Iglu-compatible schema
+  * key:
+  *
+  * 1. vendor
+  * 2. name
+  * 3. format
+  * 4. version
+  */
+case class SchemaKey(val vendor: String,
+                     val name: String,
+                     val format: String,
+                     val version: SchemaVer) {
 
   /**
-   * Extract the model, revision, and addition of the SchemaVer
-   *
-   * Note that we have to return an Option here because we
-   * previously designed versions to be stringly typed.
-   *
-   * @return tuple containing the model, revision, and addition,
-   *         converted to Ints
-   */
+    * Extract the model, revision, and addition of the SchemaVer
+    *
+    * Note that we have to return an Option here because we
+    * previously designed versions to be stringly typed.
+    *
+    * @return tuple containing the model, revision, and addition,
+    *         converted to Ints
+    */
   def getModelRevisionAddition: Option[(Int, Int, Int)] = version match {
-    case SchemaKey.ModelRevisionAdditionRegex(m, r, a) => (m.toInt, r.toInt, a.toInt).some
+    case SchemaKey.ModelRevisionAdditionRegex(m, r, a) =>
+      (m.toInt, r.toInt, a.toInt).some
     case _ => None
   }
 
   /**
-   * Converts a SchemaKey into a Jackson JsonNode
-   * containing each element. The properties in this
-   * JSON conform to the self-describing JSON schema.
-   *
-   * @return the SchemaKey as a JsonNode
-   */
+    * Converts a SchemaKey into a Jackson JsonNode
+    * containing each element. The properties in this
+    * JSON conform to the self-describing JSON schema.
+    *
+    * @return the SchemaKey as a JsonNode
+    */
   def toJsonNode: JsonNode =
     asJsonNode(this.toJValue)
 
   /**
-   * Converts a SchemaKey into a json4s JValue
-   * containing each element. The properties in this
-   * JSON conform to the self-describing JSON schema.
-   *
-   * @return the SchemaKey as a JValue
-   */
+    * Converts a SchemaKey into a json4s JValue
+    * containing each element. The properties in this
+    * JSON conform to the self-describing JSON schema.
+    *
+    * @return the SchemaKey as a JValue
+    */
   def toJValue: JValue =
-    ("vendor"  -> vendor) ~
-    ("name"    -> name) ~
-    ("format"  -> format) ~
-    ("version" -> version)
+    ("vendor" -> vendor) ~
+      ("name" -> name) ~
+      ("format" -> format) ~
+      ("version" -> version)
 
   /**
-   * Converts a SchemaKey into a path which is compatible
-   * with most local and remote Iglu schema repositories.
-   *
-   * @return a path usable for addressing local and remote
-   *         Iglu schema lookups
-   */
+    * Converts a SchemaKey into a path which is compatible
+    * with most local and remote Iglu schema repositories.
+    *
+    * @return a path usable for addressing local and remote
+    *         Iglu schema lookups
+    */
   def toPath: String =
     s"$vendor/$name/$format/$version"
 
   /**
-   * Converts the SchemaKey back to an Iglu-format
-   * schema URI.
-   *
-   * @return the SchemaKey as a Iglu-format schema
-   *         URI.
-   */
+    * Converts the SchemaKey back to an Iglu-format
+    * schema URI.
+    *
+    * @return the SchemaKey as a Iglu-format schema
+    *         URI.
+    */
   def toSchemaUri: String =
     s"iglu:${toPath}"
 
   /**
-   * The optimal String representation of a SchemaKey
-   * is as an Iglu-format schema URI.
-   *
-   * @return the String representation of this
-   *         SchemaKey
-   */
+    * The optimal String representation of a SchemaKey
+    * is as an Iglu-format schema URI.
+    *
+    * @return the String representation of this
+    *         SchemaKey
+    */
   override def toString: String =
     toSchemaUri
 }

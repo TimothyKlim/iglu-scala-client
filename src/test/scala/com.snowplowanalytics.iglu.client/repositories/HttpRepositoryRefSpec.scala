@@ -22,7 +22,11 @@ import org.specs2.Specification
 import org.specs2.matcher.DataTables
 import org.specs2.scalaz.ValidationMatchers
 
-class HttpRepositoryRefSpec extends Specification with DataTables with ValidationMatchers { def is = s2"""
+class HttpRepositoryRefSpec
+    extends Specification
+    with DataTables
+    with ValidationMatchers {
+  def is = s2"""
 
   This is a specification to test an HTTP-based RepositoryRef
 
@@ -34,7 +38,7 @@ class HttpRepositoryRefSpec extends Specification with DataTables with Validatio
   """
 
   val AcmeConfig = SpecHelpers.asJValue(
-       """|{
+    """|{
             |"name": "Acme Iglu Repo",
             |"priority": 5,
             |"vendorPrefixes": [ "com.acme" ],
@@ -43,11 +47,11 @@ class HttpRepositoryRefSpec extends Specification with DataTables with Validatio
                 |"uri": "http://iglu.acme.com"
               |}
             |}
-          |}""".stripMargin.replaceAll("[\n\r]","")
-      )
+          |}""".stripMargin.replaceAll("[\n\r]", "")
+  )
 
   val AcmeConfigWithAuth = SpecHelpers.asJValue(
-       """|{
+    """|{
           |"name": "Acme Secret Iglu Repo",
           |"priority": 3,
           |"vendorPrefixes": [ "com.acme" ],
@@ -57,8 +61,8 @@ class HttpRepositoryRefSpec extends Specification with DataTables with Validatio
           |    "uri": "http://iglu.acme.com"
           |  }
           |}
-          |}""".stripMargin.replaceAll("[\n\r]","")
-      )
+          |}""".stripMargin.replaceAll("[\n\r]", "")
+  )
 
   def e1 = HttpRepositoryRef.isHttp(AcmeConfig) must beTrue
 
@@ -71,10 +75,13 @@ class HttpRepositoryRefSpec extends Specification with DataTables with Validatio
   }
 
   def e3 = {
-    val schemaKey = SchemaKey("com.snowplowanalytics.snowplow", "link_click", "jsonschema", "1-0-0")
+    val schemaKey = SchemaKey("com.snowplowanalytics.snowplow",
+                              "link_click",
+                              "jsonschema",
+                              "1-0-0")
 
     val expected = SpecHelpers.asJsonNode(
-       """|{
+      """|{
             |"$schema": "http://iglucentral.com/schemas/com.snowplowanalytics.self-desc/schema/jsonschema/1-0-0#",
             |"description": "Schema for a link click event",
             |"self": {
@@ -104,7 +111,7 @@ class HttpRepositoryRefSpec extends Specification with DataTables with Validatio
             |},
             |"required": ["targetUrl"],
             |"additionalProperties": false
-          |}""".stripMargin.replaceAll("[\n\r]","")
+          |}""".stripMargin.replaceAll("[\n\r]", "")
     )
 
     val actual = SpecHelpers.IgluCentral.lookupSchema(schemaKey)
@@ -118,7 +125,8 @@ class HttpRepositoryRefSpec extends Specification with DataTables with Validatio
 
   def e5 = {
     val expected = HttpRepositoryRef(
-      config = RepositoryRefConfig("Acme Secret Iglu Repo", 3, List("com.acme")),
+      config =
+        RepositoryRefConfig("Acme Secret Iglu Repo", 3, List("com.acme")),
       uri = "http://iglu.acme.com",
       Some("de305d54-75b4-431b-adb2-eb6b9e546014")
     )

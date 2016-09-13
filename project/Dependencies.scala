@@ -19,32 +19,32 @@ object Dependencies {
 
   object V {
     // Java
-    val commonsLang     = "3.1"
-    val jacksonDatabind = "2.2.3"
-    val jsonValidator   = "2.2.3"
+    val commonsLang = "3.4"
+    val jacksonDatabind = "2.8.2"
+    val jsonValidator = "2.2.6"
     // Scala
-    val json4s          = "3.2.11"
-    val scalaz7         = "7.0.0"
-    val collUtils       = "6.20.0"
+    val json4s = "3.4.0"
+    val scalaz7 = "7.2.6"
+    val collUtils = "6.37.0"
     // Scala (test only)
-    val specs2          = "2.3.13" // Downgrade to prevent issues in job tests. WAS: "2.3.11"
-    val scalazSpecs2    = "0.2"
-    val mockito         = "1.10.19"
+    val specs2 = "3.7"
+    val scalazSpecs2 = "0.4.0"
+    val mockito = "1.10.19"
   }
 
   object Libraries {
     // Java
-    val commonsLang      = "org.apache.commons"         %  "commons-lang3"           % V.commonsLang
-    val jacksonDatabind  = "com.fasterxml.jackson.core" %  "jackson-databind"        % V.jacksonDatabind
-    val jsonValidator    = "com.github.fge"             %  "json-schema-validator"   % V.jsonValidator
+    val commonsLang = "org.apache.commons" % "commons-lang3" % V.commonsLang
+    val jacksonDatabind = "com.fasterxml.jackson.core" % "jackson-databind" % V.jacksonDatabind
+    val jsonValidator = "com.github.fge" % "json-schema-validator" % V.jsonValidator
     // Scala
-    val json4sJackson    = "org.json4s"                 %% "json4s-jackson"          % V.json4s
-    val json4sScalaz     = "org.json4s"                 %% "json4s-scalaz"           % V.json4s
-    val scalaz7          = "org.scalaz"                 %% "scalaz-core"             % V.scalaz7
-    val collUtils        = "com.twitter"                %% "util-collection"         % V.collUtils
+    val json4sJackson = "org.json4s" %% "json4s-jackson" % V.json4s
+    val json4sScalaz = "org.json4s" %% "json4s-scalaz" % V.json4s
+    val scalaz7 = "org.scalaz" %% "scalaz-core" % V.scalaz7
+    val collUtils = "com.twitter" %% "util-collection" % V.collUtils
     // Scala (test only)
-    val specs2           = "org.specs2"                 %% "specs2"                  % V.specs2          % "test"
-    val scalazSpecs2     = "org.typelevel"              %% "scalaz-specs2"           % V.scalazSpecs2    % "test"
-    val mockito          = "org.mockito"                % "mockito-core"             % V.mockito         % "test"
+    val specs2 = "org.specs2" %% "specs2" % V.specs2 % "test"
+    val scalazSpecs2 = "org.typelevel" %% "scalaz-specs2" % V.scalazSpecs2 % "test"
+    val mockito = "org.mockito" % "mockito-core" % V.mockito % "test"
   }
 }
