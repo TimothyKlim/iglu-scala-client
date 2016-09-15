@@ -23,13 +23,12 @@ object Dependencies {
     val jacksonDatabind = "2.8.2"
     val jsonValidator = "2.2.6"
     // Scala
-    val json4s = "3.4.0"
-    val scalaz7 = "7.2.6"
+    val json4s = "3.5.0-SNAPSHOT"
+    val scalaz = "7.2.6"
     val collUtils = "6.37.0"
     // Scala (test only)
-    val specs2 = "3.7"
+    val specs2 = "3.8.5"
     val scalazSpecs2 = "0.4.0"
-    val mockito = "1.10.19"
   }
 
   object Libraries {
@@ -40,11 +39,11 @@ object Dependencies {
     // Scala
     val json4sJackson = "org.json4s" %% "json4s-jackson" % V.json4s
     val json4sScalaz = "org.json4s" %% "json4s-scalaz" % V.json4s
-    val scalaz7 = "org.scalaz" %% "scalaz-core" % V.scalaz7
+    val scalaz = "org.scalaz" %% "scalaz-core" % V.scalaz
     val collUtils = "com.twitter" %% "util-collection" % V.collUtils
     // Scala (test only)
-    val specs2 = "org.specs2" %% "specs2" % V.specs2 % "test"
+    val specs2 = "org.specs2" %% "specs2-core" % V.specs2 % "test"
+    val specs2Mock = "org.specs2" %% "specs2-mock" % V.specs2
     val scalazSpecs2 = "org.typelevel" %% "scalaz-specs2" % V.scalazSpecs2 % "test"
-    val mockito = "org.mockito" % "mockito-core" % V.mockito % "test"
   }
 }
